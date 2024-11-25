@@ -1,0 +1,3 @@
+[submodule "redstar"]
+	path = redstar
+	url = https://github.com/osuRedstar/Light-Redstar-Windows
