@@ -1,3 +1,6 @@
 [submodule "redstar"]
 	path = redstar
 	url = https://github.com/osuRedstar/Light-Redstar-Windows
+[submodule "common"]
+	path = common
+	url = https://github.com/osuRedstar/common
