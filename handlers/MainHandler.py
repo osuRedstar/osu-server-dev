@@ -64,54 +64,12 @@ class handler(requestsManager.asyncRequestHandler):
 	@tornado.gen.engine
 	@sentry.captureTornado
 	def asyncGet(self):
-		
 		if self.request.host.startswith("a."): #avatarserver
 			IDM(self, "avatars/-1.png", Range=False)
 			log.info(f"[avatarserver] | {self.getRequestIP()} - - {self.request.uri}")
 		elif self.request.host.startswith("old."): #lets
 			log.info(f"[lets] | 404: {self.request.uri}")
-			self.write("""
-					<html>
-						<head>
-							<style>
-								@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,600,400italic,600italic,700italic,900,900italic);
-								@import url(https://fonts.googleapis.com/css?family=Raleway:400,700);
-								html, body {
-									height: 90%;
-									background-image: url(http://y.zxq.co/xtffuu.png);
-								}
-								.main {
-									height: 100%;
-									width: 100%;
-									display: table;
-								}
-								.wrapper {
-									display: table-cell;
-									height: 90%;
-									vertical-align: middle;
-								}
-								body {
-									font-family: Source Sans Pro;
-									text-align: center;
-								}
-								h1, h2, h3, h4, h5, h6 {
-									font-family: Raleway;
-								}
-							</style>
-						</head>
-						<body>
-							<div class = "main">
-								<div class = "wrapper">
-									<a href="https://ripple.moe"><img src="http://y.zxq.co/ufaibw.png"></a>
-									<h3>Howdy, you're still connected to Ripple!</h3>
-									You can't access osu!'s website if the Server Switcher is On.<br>
-									Please open the <b>Server Switcher</b> and click <b>On/Off</b> to switch server, then refresh this page.
-									<h4>If you still can't access osu! website even if the switcher is Off, <a href="http://www.refreshyourcache.com/" target="_blank">clean your browser cache</a>.</h4>
-								</div>
-							</div>
-						</body>
-					</html>
-					""")
+			IDM(self, "templates/lets/main.html", Range=False)
 		elif self.request.host.startswith("c."): #pep.py
 			glob.self = self
 
@@ -119,29 +77,7 @@ class handler(requestsManager.asyncRequestHandler):
 			#html += "<iframe src='https://ghostbin.co/paste/bwe8z' style='position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;'></iframe>"
 			#Yes. I just wrote the credit... in it.
 
-			html += '''
-			<pre>
-                    ______                   __
-  ____  _______  __/ / __ )____ _____  _____/ /_  ____
- / __ \/ ___/ / / / / __  / __ `/ __ \/ ___/ __ \/ __ \\
-/ /_/ (__  ) /_/ /_/ /_/ / /_/ / / / / /__/ / / / /_/ /
-\____/____/\__,_(_)_____/\__,_/_/ /_/\___/_/ /_/\____/
-osu!bancho
-
-                 .  o ..
-                 o . o o.o
-                      ...oo
-                        __[]__
-                     __|_o_o_o\__
-                     \\""""""""""/
-                      \. ..  . /
-                 ^^^^^^^^^^^^^^^^^^^^
-
-web:    <a target="_blank", href="https://redstar.moe">https://redstar.moe</a>
-status: <a target="_blank", href="http://status.redstar.moe">http://status.redstar.moe</a>
-github: <a target="_blank", href="http://github.com/osuRedstar">http://github.com/osuRedstar</a>
-</pre>'''
-			self.write(html)
+			IDM(self, "templates/pep/main.html", Range=False)
 
 	def asyncPost(self):
 		if self.request.host.startswith("a."): setStatuscode.tornado405(self, "GET") #avatarserver
