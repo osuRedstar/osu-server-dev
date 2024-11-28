@@ -4,6 +4,7 @@ import json
 import time
 from common.log import logUtils as log
 from common.web import requestsManager
+import geoip2.database
 import traceback
 
 def exceptionE(msg=""): e = traceback.format_exc(); log.error(f"{msg} \n{e}"); return e
@@ -21,6 +22,75 @@ class calculate_md5:
         md5 = hashlib.md5()
         md5.update(t.encode("utf-8"))
         return md5.hexdigest()
+
+def IPtoFullData(IP): #전체 정보를 가져오기 위한 코드
+    reader = geoip2.database.Reader("GeoLite2-City.mmdb")
+    try:
+        res = reader.city(IP)
+        data = {
+            "ip": IP,
+            "city": res.city.name,
+            "region": res.subdivisions.most_specific.name,
+            "country": res.country.iso_code,
+            "country_full": res.country.name,
+            "continent": res.continent.code,
+            "continent_full": res.continent.name,
+            "loc": f"{res.location.latitude},{res.location.longitude}",
+            "postal": res.postal.code if res.postal.code else ""
+        }
+    except geoip2.errors.AddressNotFoundError:
+        data = {
+            "ip": IP, "city": "Unknown", "region": "Unknown", "country": "XX", "country_full": "Unknown", "continent": "Unknown", "continent_full": "Unknown", "loc": "Unknown", "postal": "Unknown"
+        }
+        log.error(f"주어진 IP 주소 : {IP} 를 찾을 수 없습니다.")
+    except:
+        data = {
+            "ip": IP, "city": "Unknown", "region": "Unknown", "country": "XX", "country_full": "Unknown", "continent": "Unknown", "continent_full": "Unknown", "loc": "Unknown", "postal": "Unknown"
+        }
+        exceptionE("국가코드 오류 발생")
+    finally: reader.close()
+    return data
+
+def getRequestInfo(self):
+    IsCloudflare = IsNginx = IsHttp = False
+    real_ip = self.getRequestIP()
+    request_url = self.request.headers.get("X-Forwarded-Proto") if "X-Forwarded-Proto" in self.request.headers else self.request.protocol; request_url += f"://{self.request.host}{self.request.uri}"
+    if "Cf-Ipcountry" in self.request.headers:
+        country_code = self.request.headers["Cf-Ipcountry"]
+        IsCloudflare = IsNginx = True; Server = "Cloudflare"
+    else:
+        country_code = IPtoFullData(real_ip)["country"]
+        try:
+            try: Server = os.popen("nginx.exe -v 2>&1").read().split(":")[1].strip()
+            #TODO 아래 except mediaserver 에서랑 경로가 다르니 수정하기
+            except: ngp = os.getcwd().replace(os.getcwd().split("\\")[-1], "nginx/nginx.exe").replace("\\", "/"); Server = os.popen(f'{ngp} -v 2>&1').read().split(":")[1].strip()
+            IsNginx = True
+        except: IsHttp = True; Server = self._headers.get("Server")
+    client_ip = self.request.remote_ip
+    User_Agent = self.request.headers.get("User-Agent") if "User-Agent" in self.request.headers else ""
+    Referer = self.request.headers.get("Referer") if "Referer" in self.request.headers else ""
+    return real_ip, request_url, country_code, client_ip, User_Agent, Referer, IsCloudflare, IsNginx, IsHttp, Server
+
+def request_msg(self):
+    # Logging the request IP address
+    print("")
+    real_ip, request_url, country_code, client_ip, User_Agent, Referer, IsCloudflare, IsNginx, IsHttp, Server = getRequestInfo(self)
+    rMsg = f"Request from IP: {real_ip}, {client_ip} ({country_code}) | URL: {request_url} | From: {User_Agent} | Referer: {Referer}"
+
+    #필?터?링
+    with open("botList.json", "r") as f:
+        botList = json.load(f)
+        if any(i in User_Agent.lower() for i in botList["no"]) and not any(i in User_Agent.lower() for i in botList["ok"]):
+            log.warning(f"bot 감지! | {rMsg}")
+        elif "python-requests" in User_Agent.lower():
+            log.warning(f"python-requests 감지! | {rMsg}")
+        elif "python-urllib" in User_Agent.lower():
+            log.warning(f"Python-urllib 감지! | {rMsg}")
+
+        elif any(i in User_Agent.lower() for i in botList["ok"]): log.info(f"bot 감지! | {rMsg}")
+        elif "postmanruntime" in User_Agent.lower(): log.debug2(f"PostmanRuntime 감지! | {rMsg}")
+        elif User_Agent == "osu!": log.info(f"osu! 감지! | {rMsg}")
+        else: log.info(rMsg)
 
 def resPingMs(self): return (time.time() - self.request._start_time) * 1000
 
