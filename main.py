@@ -9,6 +9,7 @@ from objects import glob
 import redis
 
 from handlers import MainHandler
+#from helpers import getmmdb
 
 glob.pool = ThreadPool(4)
 
@@ -18,6 +19,8 @@ def make_app():
     ])
 
 if __name__ == "__main__":
+    #getmmdb.dl() #config 설정완료시 활성화 하기
+
     #glob.db = dbConnector.db(glob.conf.config["db"]["host"], glob.conf.config["db"]["username"], glob.conf.config["db"]["password"], glob.conf.config["db"]["database"], int(glob.conf.config["db"]["workers"]))
     glob.db = dbConnector.db("127.0.0.1", "osu", "821059401241", "redstar", 4)
 
