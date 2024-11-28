@@ -1,0 +1,14 @@
+{
+	"ok": [
+		"discord"
+	],
+	"no": [
+		"bot",
+		"crawler",
+		"bytedance.com",
+		"censysinspect",
+		"internet-measurement.com",
+		"googleother",
+		"facebookexternalhit/1.1"
+	]
+}
