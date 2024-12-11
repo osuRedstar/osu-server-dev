@@ -1,4 +1,4 @@
-from helpers import config
+from helpers import configHelper as config
 import threading
 import requests
 import tarfile
@@ -23,7 +23,7 @@ def mmdbdl():
 
 def wk():
     while True:
-        now = datetime.now(); print(now)
+        now = datetime.now()
         if now.weekday() == 0 and now.hour == 0: mmdbdl()
         time.sleep(1800)
 

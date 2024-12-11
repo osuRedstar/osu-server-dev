@@ -96,6 +96,11 @@ def resPingMs(self): return (time.time() - self.request._start_time) * 1000
 
 class setStatuscode:
     @classmethod
+    def tornado404(cls, self):
+        self.set_status(404)
+        self.write(f"<html><title>404: Not Found</title><body>404: Not Found</body></html>")
+
+    @classmethod
     def tornado405(cls, self, method=None):
         method = f"<br>Recommend {method} Method" if method else ""
         self.set_status(405)

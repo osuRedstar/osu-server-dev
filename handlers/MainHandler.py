@@ -65,18 +65,12 @@ class handler(requestsManager.asyncRequestHandler):
 	@sentry.captureTornado
 	def asyncGet(self):
 		if self.request.host.startswith("a."): #avatarserver
-			IDM(self, "avatars/-1.png", Range=False)
+			IDM(self, "avatars/avatars/-1.png", Range=False)
 			log.info(f"[avatarserver] | {self.getRequestIP()} - - {self.request.uri}")
 		elif self.request.host.startswith("old."): #lets
 			log.info(f"[lets] | 404: {self.request.uri}")
 			IDM(self, "templates/lets/main.html", Range=False)
 		elif self.request.host.startswith("c."): #pep.py
-			glob.self = self
-
-			html = 	"<html><head><title>Aoba's a cutie?</title>"
-			#html += "<iframe src='https://ghostbin.co/paste/bwe8z' style='position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;'></iframe>"
-			#Yes. I just wrote the credit... in it.
-
 			IDM(self, "templates/pep/main.html", Range=False)
 
 	def asyncPost(self):

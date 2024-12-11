@@ -23,10 +23,11 @@ from common.web import cheesegull
 from datetime import datetime
 from helpers import configHelper
 
-conf = configHelper.config("config.ini")
-bancho_api_key = conf.config["osu"]["apikey"]
-server_domain = conf.config["server"]["server-domain"]
-letsapiurl = conf.config["server"]["letsapiurl"].rstrip("/")
+#conf = configHelper.config("config.ini")
+conf = glob.conf
+bancho_api_key = eval(conf.config["bancho"]["apikeys"])[0]
+server_domain = conf.config["server"]["osuserverdomain"]
+letsapiurl = conf.config["server"]["letsapiurl"].rstrip("/") if False else "http://127.0.0.1:5002/letsapi"
 
 def userDomainCheck():
 	try:

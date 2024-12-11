@@ -1,6 +1,8 @@
 """Global objects and variables"""
 
 import time
+from helpers import configHelper
+conf = configHelper.config("config.ini")
 from common.ddog import datadogClient
 from common.files import fileBuffer, fileLocks
 from objects import channelList
@@ -18,7 +20,7 @@ ACHIEVEMENTS_VERSION = 1
 DATADOG_PREFIX = "ripple"
 db = None
 redis = None
-conf = None
+#conf = None
 application = None
 pool = None
 pascoa = {}
